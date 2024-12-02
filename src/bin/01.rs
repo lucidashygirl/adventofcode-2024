@@ -1,5 +1,7 @@
+#![warn(clippy::nursery, clippy::pedantic)]
 advent_of_code::solution!(1);
 
+#[must_use]
 pub fn part_one(input: &str) -> Option<u32> {
     let input = parse_input(input);
 
@@ -25,23 +27,29 @@ pub fn part_one(input: &str) -> Option<u32> {
     Some(total)
 }
 
+#[must_use]
 pub fn part_two(input: &str) -> Option<u32> {
     let parsed_input = parse_input(input);
+
     let mut lengths: Vec<u32> = Vec::new();
+
     for left in &parsed_input.0 {
-        let sim: Vec<&u32> = parsed_input.1.iter().filter(|x| x == &left).collect();
-        let score = left * sim.len() as u32;
+        let sim = parsed_input.1.iter().filter(|x| x == &left).count();
+        let score = left * u32::try_from(sim).unwrap_or(0);
         lengths.push(score);
     }
+
     let score = lengths.iter().sum::<u32>();
+
     if score == 0 {
         return None;
     }
+
     Some(score)
 }
 
 fn parse_input(input: &str) -> (Vec<u32>, Vec<u32>) {
-    let all_inputs: Vec<&str> = input.split("\n").collect();
+    let all_inputs: Vec<&str> = input.split('\n').collect();
     let mut left: Vec<u32> = Vec::new();
     let mut right: Vec<u32> = Vec::new();
     for input in all_inputs {
@@ -55,8 +63,8 @@ fn parse_input(input: &str) -> (Vec<u32>, Vec<u32>) {
         right.push(right_parsed);
     }
 
-    left.sort();
-    right.sort();
+    left.sort_unstable();
+    right.sort_unstable();
 
     (left, right)
 }

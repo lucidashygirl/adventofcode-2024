@@ -95,7 +95,6 @@ fn is_safe(report: &[u32]) -> bool {
             let diff = report[i - 1] - report[i];
             let in_bounds = (1..=3).contains(&(diff));
             if !in_bounds {
-                println!("{report:?}");
                 return false;
             }
         }

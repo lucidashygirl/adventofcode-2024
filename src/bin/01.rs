@@ -13,7 +13,6 @@ pub fn part_one(input: &str) -> Option<u32> {
     let mut distances: Vec<u32> = Vec::new();
 
     for inputs in parsed_inputs {
-        println!("{inputs:?}");
         let (l, r) = inputs;
         let dist = if l > r { l - r } else { r - l };
         distances.push(dist);

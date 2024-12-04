@@ -26,7 +26,6 @@ pub fn part_one(input: &str) -> Option<u32> {
         }
         mult_chars.push(chars.iter().collect());
     }
-    println!("{mult_chars:?}");
     let mut parsed_mult: Vec<u32> = Vec::new();
     for i in mult_chars {
         let split: Vec<&str> = i.split(',').collect();
@@ -39,7 +38,6 @@ pub fn part_one(input: &str) -> Option<u32> {
             }
         }
     }
-    println!("{parsed_mult:?}");
     Some(parsed_mult.iter().sum())
 }
 
@@ -82,7 +80,6 @@ pub fn part_two(input: &str) -> Option<u32> {
         }
         mult_chars.push(chars.iter().collect());
     }
-    println!("{mult_chars:?}");
     let mut parsed_mult: Vec<u32> = Vec::new();
     for i in mult_chars {
         let split: Vec<&str> = i.split(',').collect();
@@ -95,7 +92,6 @@ pub fn part_two(input: &str) -> Option<u32> {
             }
         }
     }
-    println!("{parsed_mult:?}");
     Some(parsed_mult.iter().sum())
 }
 

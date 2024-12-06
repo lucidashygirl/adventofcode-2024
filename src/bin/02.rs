@@ -15,8 +15,8 @@ pub fn part_one(input: &str) -> Option<u32> {
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    let mut safe_reports: u32 = 0;
     let input_parsed = parse_input(input);
+    let mut safe_reports: u32 = 0;
     for report in input_parsed {
         if is_safe_damp(report) {
             safe_reports += 1;
@@ -26,34 +26,6 @@ pub fn part_two(input: &str) -> Option<u32> {
         return None;
     }
     Some(safe_reports)
-}
-
-fn ascending(report: &[u32]) -> (u32, Option<usize>) {
-    let mut errors = 0;
-    let mut error: Option<usize> = None;
-    for i in 1..report.len() {
-        if report[i - 1] >= report[i] {
-            if error.is_none() {
-                error = Some(i - 1);
-            }
-            errors += 1;
-        }
-    }
-    (errors, error)
-}
-
-fn descending(report: &[u32]) -> (u32, Option<usize>) {
-    let mut errors = 0;
-    let mut error: Option<usize> = None;
-    for i in 1..report.len() {
-        if report[i - 1] <= report[i] {
-            if error.is_none() {
-                error = Some(i - 1);
-            }
-            errors += 1;
-        }
-    }
-    (errors, error)
 }
 
 fn parse_input(input: &str) -> Vec<Vec<u32>> {
@@ -104,36 +76,69 @@ fn is_safe(report: &[u32]) -> bool {
 }
 
 fn is_safe_damp(mut report: Vec<u32>) -> bool {
-    /*
-    let asc_err = ascending(&report);
-    let des_err = descending(&report);
-
-
-    let ascending = asc_err.0 <= 1;
-    let descending = des_err.0 <= 1;
-    */
-
-    if report[0] > report[1] {
+    let ascending = report.is_sorted_by(|a, b| a < b);
+    let descending = report.is_sorted_by(|a, b| a > b);
+    let mut has_errored = false;
+    if descending {
         report.reverse();
     }
-
-    let mut errors = 0;
-    for i in 1..report.len() {
-        if report[i - 1] >= report[i] {
-            errors += 1;
-            continue;
-        }
-
-        let diff = report[i].abs_diff(report[i - 1]);
-        let in_bounds = (1..=3).contains(&(diff));
-        if !in_bounds {
-            errors += 1;
+    if !ascending && !descending {
+        has_errored = true;
+        let brute_force = brute_force_is_ascending(&report);
+        report = brute_force.1;
+        match brute_force.0 {
+            Some(true) => (),
+            Some(false) => report.reverse(),
+            None => return false,
         }
     }
-    if errors > 1 {
-        return false;
+    if !has_errored {
+        for i in 1..report.len() {
+            if report[i - 1] > report[i] {
+                has_errored = true;
+                report.remove(i);
+                break;
+            }
+
+            let diff = report[i] - report[i - 1];
+            let in_bounds = (1..=3).contains(&(diff));
+            if !in_bounds {
+                has_errored = true;
+                report.remove(i);
+                break;
+            }
+        }
+    }
+    if has_errored {
+        for i in 1..report.len() {
+            if report[i - 1] > report[i] {
+                return false;
+            }
+
+            let diff = report[i] - report[i - 1];
+            let in_bounds = (1..=3).contains(&(diff));
+            if !in_bounds {
+                return false;
+            }
+        }
     }
     true
+}
+
+fn brute_force_is_ascending(report: &[u32]) -> (Option<bool>, Vec<u32>) {
+    for i in 0..report.len() {
+        let mut truncated_report = report.to_vec();
+        truncated_report.remove(i);
+        let ascending = truncated_report.is_sorted_by(|a, b| a < b);
+        let descending = truncated_report.is_sorted_by(|a, b| a > b);
+        if ascending {
+            return (Some(true), truncated_report);
+        }
+        if descending {
+            return (Some(false), truncated_report);
+        }
+    }
+    (None, Vec::new())
 }
 /*
 fn dampen(mut report: Vec<u32>) -> Vec<u32> {
